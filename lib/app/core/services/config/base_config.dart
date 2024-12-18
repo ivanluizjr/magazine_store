@@ -35,7 +35,7 @@ class StagingConfig implements IBaseConfig {
 
 class ProdConfig implements IBaseConfig {
   @override
-  String get apiHost => 'prod.com';
+  String get apiHost => 'https://fakestoreapi.com';
 
   @override
   bool get reportErrors => true;
