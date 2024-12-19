@@ -150,6 +150,7 @@ class _ProductsPageState extends State<ProductsPage> {
                 return RefreshIndicator(
                   color: Colors.grey[300],
                   onRefresh: () async {
+                    widget.productsPageController.clearSearch();
                     final hasConnection = await widget.internetConnectionService
                         .checkConnection();
 
