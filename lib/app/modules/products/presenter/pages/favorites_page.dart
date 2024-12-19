@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:magazine_store/app/core/locales/app_locales.dart';
 import 'package:magazine_store/app/core/themes/app_colors.dart';
 import 'package:magazine_store/app/core/widgets/text_widget.dart';
@@ -47,8 +48,18 @@ class _FavoritesPageState extends State<FavoritesPage> {
           final state = widget.productsPageController.state;
           if (state is ProductPageSuccessState) {
             if (widget.favoriteProducts.isEmpty) {
-              return const Center(
-                child: Text("No favorite products"),
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset('assets/svg/list_empty.svg'),
+                    TextWidget.poppins(
+                      text: 'No favorite products',
+                      fontSize: 18,
+                      colorText: Colors.grey,
+                    ),
+                  ],
+                ),
               );
             } else {
               return ListView.builder(

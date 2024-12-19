@@ -79,11 +79,11 @@ class _ProductsPageState extends State<ProductsPage> {
               fontWeight: FontWeight.w600,
             ),
             GestureDetector(
-                onTap: () {
-                  widget.productsPageController
-                      .getFavoriteProducts()
-                      .then((favoriteProducts) {
-                    if (favoriteProducts.isNotEmpty) {
+              onTap: () {
+                widget.productsPageController.getFavoriteProducts().then(
+                  (favoriteProducts) {
+                    if (favoriteProducts.isNotEmpty ||
+                        favoriteProducts.isEmpty) {
                       Modular.to.pushNamed(
                         AppRoutes.favoritesPageRoute,
                         arguments: {
@@ -92,70 +92,199 @@ class _ProductsPageState extends State<ProductsPage> {
                               widget.productsPageController,
                         },
                       );
-                    } else {
-                      SnackBarService.showNotice(
-                        // ignore: use_build_context_synchronously
-                        context: context,
-                        message: AppLocales.notice,
-                      );
                     }
-                  });
-                },
-                child: SvgPicture.asset('assets/svg/favorite.svg')),
+                  },
+                );
+              },
+              child: SvgPicture.asset('assets/svg/favorite.svg'),
+            ),
           ],
         ),
       ),
-      body: Observer(
-        builder: (_) {
-          final state = widget.productsPageController.state;
-          if (state is ProductPageLoadingState) {
-            return Shimmer.fromColors(
-              baseColor: Colors.grey[300]!,
-              highlightColor: Colors.grey[100]!,
-              child: ListView.builder(
-                itemCount: 5,
-                itemBuilder: (context, index) {
-                  return CardsWidget(
-                    id: 0,
-                    image: '',
-                    title: '',
-                    ratingRate: Rating(rate: 0.0, count: 0),
-                    ratingCount: Rating(rate: 0.0, count: 0),
-                    price: const CurrencyVO(0.0),
-                    onTap: null,
-                    onTapFavorite: null,
-                    isFavorite: false,
-                    childFavorite: Container(),
+      // body: Observer(
+      //   builder: (_) {
+      //     final state = widget.productsPageController.state;
+      //     if (state is ProductPageLoadingState) {
+      //       return Shimmer.fromColors(
+      //         baseColor: Colors.grey[300]!,
+      //         highlightColor: Colors.grey[100]!,
+      //         child: ListView.builder(
+      //           itemCount: 5,
+      //           itemBuilder: (context, index) {
+      //             return CardsWidget(
+      //               id: 0,
+      //               image: '',
+      //               title: '',
+      //               ratingRate: Rating(rate: 0.0, count: 0),
+      //               ratingCount: Rating(rate: 0.0, count: 0),
+      //               price: const CurrencyVO(0.0),
+      //               onTap: null,
+      //               onTapFavorite: null,
+      //               isFavorite: false,
+      //               childFavorite: Container(),
+      //             );
+      //           },
+      //         ),
+      //       );
+      //     } else if (state is ProductPageSuccessState) {
+      //       return Column(
+      //         children: [
+      //           Padding(
+      //             padding: const EdgeInsets.only(
+      //               top: 18.0,
+      //               left: 19.0,
+      //               right: 19.0,
+      //             ),
+      //             child: TextFieldWidget.search(
+      //               fillColor: AppColors.greyMedium,
+      //               widthBorder: 0.0,
+      //               onChanged: (searchQuery) {
+      //                 if (searchQuery.isEmpty) {
+      //                   widget.productsPageController.getProducts();
+      //                 } else {
+      //                   widget.productsPageController.filterProduct(
+      //                     searchQuery,
+      //                     context,
+      //                   );
+      //                 }
+      //               },
+      //             ),
+      //           ),
+      //           Expanded(
+      //             child: ListView.builder(
+      //               itemCount:
+      //                   widget.productsPageController.listProductsEntity.length,
+      //               itemBuilder: (context, index) {
+      //                 final products = widget
+      //                     .productsPageController.listProductsEntity[index];
+      //                 final isFavorite =
+      //                     state.favoriteStatus[products.id] ?? false;
+
+      //                 return CardsWidget(
+      //                   id: products.id,
+      //                   image: products.image,
+      //                   title: products.title,
+      //                   ratingRate: products.rating,
+      //                   ratingCount: products.rating,
+      //                   price: products.price,
+      //                   onTap: () {
+      //                     Modular.to.pushNamed(AppRoutes.productDetailsRoute,
+      //                         arguments: {
+      //                           'id': products.id,
+      //                           'image': products.image,
+      //                           'title': products.title,
+      //                           'rating': products.rating,
+      //                           'price': products.price,
+      //                           'category': products.category,
+      //                           'description': products.description,
+      //                           'isFavorite': isFavorite,
+      //                         });
+      //                   },
+      //                   childFavorite: SvgPicture.asset(
+      //                     isFavorite
+      //                         ? 'assets/svg/favorite_filled.svg'
+      //                         : 'assets/svg/favorite.svg',
+      //                   ),
+      //                   onTapFavorite: () async {
+      //                     await widget.productsPageController
+      //                         .toggleFavoriteProduct(products);
+      //                   },
+      //                   isFavorite: isFavorite,
+      //                 );
+      //               },
+      //             ),
+      //           ),
+      //         ],
+      //       );
+      //     } else if (state is ProductPageEmptyState ||
+      //         state is ProductPageListEmptyState) {
+      //       return Center(
+      //         child: Column(
+      //           mainAxisAlignment: MainAxisAlignment.center,
+      //           children: [
+      //             SvgPicture.asset('assets/svg/list_empty.svg'),
+      //             TextWidget.poppins(
+      //               text: state is ProductPageListEmptyState
+      //                   ? 'The list is empty'
+      //                   : 'No products found in the search',
+      //               fontSize: 18,
+      //               colorText: Colors.grey,
+      //             ),
+      //             const SizedBox(height: 10),
+      //             TextButton(
+      //               onPressed: () {
+      //                 widget.productsPageController.getProducts();
+      //               },
+      //               child: TextWidget.poppins(
+      //                 text: 'Back',
+      //                 fontSize: 16,
+      //                 colorText: Colors.grey,
+      //                 textDecoration: TextDecoration.underline,
+      //                 decorationColor: Colors.grey,
+      //               ),
+      //             ),
+      //           ],
+      //         ),
+      //       );
+      //     } else {
+      //       return Container();
+      //     }
+      //   },
+      // ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(
+              top: 18.0,
+              left: 19.0,
+              right: 19.0,
+              bottom: 10.0,
+            ),
+            child: TextFieldWidget.search(
+              fillColor: AppColors.greyMedium,
+              controller: widget.productsPageController.controllerSearch,
+              textInputType: TextInputType.text,
+              widthBorder: 0.0,
+              onChanged: (searchQuery) {
+                if (searchQuery.isEmpty) {
+                  widget.productsPageController.getProducts();
+                } else {
+                  widget.productsPageController.filterProduct(
+                    searchQuery,
+                    context,
                   );
-                },
-              ),
-            );
-          } else if (state is ProductPageSuccessState) {
-            return Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(
-                    top: 18.0,
-                    left: 19.0,
-                    right: 19.0,
-                  ),
-                  child: TextFieldWidget.search(
-                    fillColor: AppColors.greyMedium,
-                    widthBorder: 0.0,
-                    onChanged: (searchQuery) {
-                      if (searchQuery.isEmpty) {
-                        widget.productsPageController.getProducts();
-                      } else {
-                        widget.productsPageController.filterProduct(
-                          searchQuery,
-                          context,
-                        );
-                      }
+                }
+              },
+            ),
+          ),
+          Expanded(
+            child: Observer(
+              builder: (_) {
+                final state = widget.productsPageController.state;
+                if (state is ProductPageLoadingState) {
+                  return ListView.builder(
+                    itemCount: 5,
+                    itemBuilder: (context, index) {
+                      return Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: CardsWidget(
+                          id: 0,
+                          image: '',
+                          title: '',
+                          ratingRate: Rating(rate: 0.0, count: 0),
+                          ratingCount: Rating(rate: 0.0, count: 0),
+                          price: const CurrencyVO(0.0),
+                          onTap: null,
+                          onTapFavorite: null,
+                          isFavorite: false,
+                          childFavorite: Container(),
+                        ),
+                      );
                     },
-                  ),
-                ),
-                Expanded(
-                  child: ListView.builder(
+                  );
+                } else if (state is ProductPageSuccessState) {
+                  return ListView.builder(
                     itemCount:
                         widget.productsPageController.listProductsEntity.length,
                     itemBuilder: (context, index) {
@@ -196,14 +325,45 @@ class _ProductsPageState extends State<ProductsPage> {
                         isFavorite: isFavorite,
                       );
                     },
-                  ),
-                ),
-              ],
-            );
-          } else {
-            return Container();
-          }
-        },
+                  );
+                } else if (state is ProductPageEmptyState ||
+                    state is ProductPageListEmptyState) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SvgPicture.asset('assets/svg/list_empty.svg'),
+                        TextWidget.poppins(
+                          text: state is ProductPageListEmptyState
+                              ? 'The list is empty'
+                              : 'No products found in the search',
+                          fontSize: 18,
+                          colorText: Colors.grey,
+                        ),
+                        const SizedBox(height: 10),
+                        TextButton(
+                          onPressed: () {
+                            widget.productsPageController.clearSearch();
+                            widget.productsPageController.getProducts();
+                          },
+                          child: TextWidget.poppins(
+                            text: 'Back',
+                            fontSize: 16,
+                            colorText: Colors.grey,
+                            textDecoration: TextDecoration.underline,
+                            decorationColor: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  return Container();
+                }
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

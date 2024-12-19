@@ -40,3 +40,13 @@ class ProducPageFailureState implements IProductsPageState {
   @override
   Map<int, bool> get favoriteStatus => throw UnimplementedError();
 }
+
+class ProductPageEmptyState implements IProductsPageState {
+  @override
+  Map<int, bool> get favoriteStatus => throw UnimplementedError();
+}
+
+class ProductPageListEmptyState implements IProductsPageState {
+  @override
+  Map<int, bool> get favoriteStatus => throw UnimplementedError();
+}

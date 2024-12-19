@@ -1,6 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:magazine_store/app/core/services/shared_preferences_service.dart';
-import 'package:magazine_store/app/core/services/snack_bar_service.dart';
 import 'package:magazine_store/app/modules/products/domain/entities/products_entity.dart';
 import 'package:magazine_store/app/modules/products/domain/usecases/get_products_usecase.dart';
 import 'package:magazine_store/app/modules/products/presenter/controllers/states/products_page_state.dart';
@@ -8,6 +9,7 @@ import 'package:mobx/mobx.dart';
 
 part 'products_page_controller.g.dart';
 
+// ignore: library_private_types_in_public_api
 class ProductsPageController = _ProductsPageControllerBase
     with _$ProductsPageController;
 
@@ -18,7 +20,7 @@ abstract class _ProductsPageControllerBase with Store {
   _ProductsPageControllerBase({
     required this.getProductsUsecase,
     required this.sharedPreferencesService,
-  });
+  }) : _controllerSearch = TextEditingController();
 
   @observable
   List<ProductsEntity> listProductsEntity = List<ProductsEntity>.empty();
@@ -32,7 +34,19 @@ abstract class _ProductsPageControllerBase with Store {
   @observable
   IProductsPageState state = ProductPageInitialState();
 
+  @observable
+  final TextEditingController? _controllerSearch;
+
+  @computed
+  TextEditingController? get controllerSearch => _controllerSearch;
+
   @action
+  void clearSearch() {
+    _controllerSearch?.clear();
+  }
+
+  Timer? _debounce;
+
   Future<void> getProducts() async {
     state = ProductPageLoadingState();
 
@@ -49,15 +63,19 @@ abstract class _ProductsPageControllerBase with Store {
       },
       onRight: (success) async {
         listProductsEntity = success;
-        productNames = success.map((e) => e.title).toList();
-        Map<int, bool> favoriteStatus = {};
-        for (var product in listProductsEntity) {
-          favoriteStatus[product.id] = await isFavoriteProduct(product);
+        if (listProductsEntity.isEmpty) {
+          state = ProductPageListEmptyState();
+        } else {
+          productNames = success.map((e) => e.title).toList();
+          Map<int, bool> favoriteStatus = {};
+          for (var product in listProductsEntity) {
+            favoriteStatus[product.id] = await isFavoriteProduct(product);
+          }
+          state = ProductPageSuccessState(
+            listProducts: listProductsEntity,
+            favoriteStatus: favoriteStatus,
+          );
         }
-        state = ProductPageSuccessState(
-          listProducts: listProductsEntity,
-          favoriteStatus: favoriteStatus,
-        );
       },
     );
   }
@@ -67,30 +85,34 @@ abstract class _ProductsPageControllerBase with Store {
     String searchQuery,
     BuildContext context,
   ) async {
-    searchQuery = searchQuery.toLowerCase();
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(
+      const Duration(milliseconds: 500),
+      () async {
+        searchQuery = searchQuery.toLowerCase();
 
-    listProductsEntity = listProductsEntity.where(
-      (product) {
-        return product.title.toLowerCase().startsWith(searchQuery);
+        listProductsEntity = listProductsEntity.where(
+          (product) {
+            return product.title.toLowerCase().startsWith(searchQuery);
+          },
+        ).toList();
+
+        if (listProductsEntity.isNotEmpty) {
+          singleProductEntity = listProductsEntity[0];
+          Map<int, bool> favoriteStatus = {};
+          for (var product in listProductsEntity) {
+            favoriteStatus[product.id] = await isFavoriteProduct(product);
+          }
+
+          state = ProductPageSuccessState(
+            listProducts: listProductsEntity,
+            favoriteStatus: favoriteStatus,
+          );
+        } else {
+          state = ProductPageEmptyState();
+        }
       },
-    ).toList();
-
-    if (listProductsEntity.isNotEmpty) {
-      singleProductEntity = listProductsEntity[0];
-      Map<int, bool> favoriteStatus = {};
-      for (var product in listProductsEntity) {
-        favoriteStatus[product.id] = await isFavoriteProduct(product);
-      }
-
-      state = ProductPageSuccessState(
-        listProducts: listProductsEntity,
-        favoriteStatus: favoriteStatus,
-      );
-    } else {
-      SnackBarService.showError(
-          context: context,
-          message: 'Nenhum produto encontrado com o nome $searchQuery');
-    }
+    );
   }
 
   @action

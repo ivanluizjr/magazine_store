@@ -29,6 +29,7 @@ class _AppWidgetState extends State<AppWidget> {
       title: 'Magazine Store',
       themeMode: ThemeMode.light,
       darkTheme: ThemeData.dark(),
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
         colorSchemeSeed: Colors.white,

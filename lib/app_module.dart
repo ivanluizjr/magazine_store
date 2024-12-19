@@ -10,11 +10,7 @@ class AppModule extends Module {
 
   @override
   void binds(Injector i) {
-    i.addInstance(
-      Dio(
-        BaseOptions(baseUrl: Environment().config.apiHost),
-      ),
-    );
+    i.add<Dio>(() => Dio(BaseOptions(baseUrl: Environment().config.apiHost)));
   }
 
   @override
