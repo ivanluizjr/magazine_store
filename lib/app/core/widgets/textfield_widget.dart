@@ -41,6 +41,7 @@ class TextFieldWidget extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
   final Color? colorStyle;
   final Color? colorHintStyle;
+  final Color? cursorColor;
 
   const TextFieldWidget({
     this.controller,
@@ -81,6 +82,7 @@ class TextFieldWidget extends StatelessWidget {
     this.colorStyle,
     super.key,
     this.maxLength = 255,
+    this.cursorColor,
   });
 
   factory TextFieldWidget.search({
@@ -98,6 +100,7 @@ class TextFieldWidget extends StatelessWidget {
     bool? filled = false,
     EdgeInsetsGeometry? contentPadding,
     InputBorder? border,
+    Color? cursorColor,
     Function(String)? onChanged,
   }) {
     final border = OutlineInputBorder(
@@ -112,6 +115,7 @@ class TextFieldWidget extends StatelessWidget {
     return TextFieldWidget(
       controller: controller,
       enabled: enabled,
+      cursorColor: cursorColor,
       textInputType: textInputType,
       filled: true,
       fillColor: fillColor,
@@ -165,6 +169,7 @@ class TextFieldWidget extends StatelessWidget {
       validator: validator,
       maxLines: maxLines,
       minLines: minLines,
+      cursorColor: cursorColor,
       decoration: InputDecoration(
         counterText: '',
         fillColor: fillColor,
