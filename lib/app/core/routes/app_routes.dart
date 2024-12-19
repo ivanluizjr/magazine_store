@@ -3,4 +3,5 @@ class AppRoutes {
   static const String productsPageRoute = '/products-page';
   static const String productDetailsRoute = '/product-details';
   static const String favoritesPageRoute = '/favorites';
+  static const String noInternetPageRoute = '/no-internet';
 }

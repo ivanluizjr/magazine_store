@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:magazine_store/app/core/internet_connection/internet_connection_service.dart';
 import 'package:magazine_store/app/core/services/shared_preferences_service.dart';
 import 'package:magazine_store/app/modules/products/domain/entities/products_entity.dart';
 import 'package:magazine_store/app/modules/products/domain/usecases/get_products_usecase.dart';
@@ -16,10 +18,12 @@ class ProductsPageController = _ProductsPageControllerBase
 abstract class _ProductsPageControllerBase with Store {
   final IGetProductsUsecase getProductsUsecase;
   final SharedPreferencesService sharedPreferencesService;
+  final IInternetConnectionService internetConnectionService;
 
   _ProductsPageControllerBase({
     required this.getProductsUsecase,
     required this.sharedPreferencesService,
+    required this.internetConnectionService,
   }) : _controllerSearch = TextEditingController();
 
   @observable
@@ -35,7 +39,8 @@ abstract class _ProductsPageControllerBase with Store {
   IProductsPageState state = ProductPageInitialState();
 
   @observable
-  final TextEditingController? _controllerSearch;
+  // ignore: prefer_final_fields
+  TextEditingController? _controllerSearch;
 
   @computed
   TextEditingController? get controllerSearch => _controllerSearch;
@@ -49,6 +54,13 @@ abstract class _ProductsPageControllerBase with Store {
 
   Future<void> getProducts() async {
     state = ProductPageLoadingState();
+
+    try {
+      await throwErrorIfNotConnectionWithInternet(internetConnectionService);
+    } catch (e) {
+      state = ProductPageNoInternetState();
+      return;
+    }
 
     final response = await getProductsUsecase(
       productsEntity: listProductsEntity,
@@ -71,6 +83,7 @@ abstract class _ProductsPageControllerBase with Store {
           for (var product in listProductsEntity) {
             favoriteStatus[product.id] = await isFavoriteProduct(product);
           }
+
           state = ProductPageSuccessState(
             listProducts: listProductsEntity,
             favoriteStatus: favoriteStatus,
@@ -156,5 +169,17 @@ abstract class _ProductsPageControllerBase with Store {
       }
     }
     return favorites;
+  }
+
+  Future<void> throwErrorIfNotConnectionWithInternet(
+    IInternetConnectionService service,
+  ) async {
+    final hasConnection = await service.checkConnection();
+
+    if (!hasConnection) {
+      throw const HttpException(
+        'No internet connection',
+      );
+    }
   }
 }

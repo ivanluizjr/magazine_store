@@ -39,12 +39,15 @@ void main() {
     },
   );
 
-  testWidgets('displays rating', (WidgetTester tester) async {
-    await tester.pumpWidget(createWidgetUnderTest());
+  testWidgets(
+    'displays rating',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(createWidgetUnderTest());
 
-    expect(
-      find.text("4.0"),
-      findsOneWidget,
-    );
-  });
+      expect(
+        find.text("4.0"),
+        findsOneWidget,
+      );
+    },
+  );
 }

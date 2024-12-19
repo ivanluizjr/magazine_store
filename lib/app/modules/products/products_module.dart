@@ -1,6 +1,8 @@
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:magazine_store/app/core/dio_cliient/dio/dio_client_service_impl.dart';
 import 'package:magazine_store/app/core/dio_cliient/dio_client_service.dart';
+import 'package:magazine_store/app/core/internet_connection/internet_connection_service.dart';
+import 'package:magazine_store/app/core/internet_connection/internet_connection_service_impl.dart';
 import 'package:magazine_store/app/core/routes/app_routes.dart';
 import 'package:magazine_store/app/core/services/shared_preferences_service.dart';
 import 'package:magazine_store/app/modules/products/data/datasources/impl/products_datasource_impl.dart';
@@ -10,6 +12,7 @@ import 'package:magazine_store/app/modules/products/domain/repositories/products
 import 'package:magazine_store/app/modules/products/domain/usecases/get_products_usecase.dart';
 import 'package:magazine_store/app/modules/products/presenter/controllers/products_page_controller.dart';
 import 'package:magazine_store/app/modules/products/presenter/pages/favorites_page.dart';
+import 'package:magazine_store/app/modules/products/presenter/pages/no_internet_page.dart';
 import 'package:magazine_store/app/modules/products/presenter/pages/product_details_page.dart';
 import 'package:magazine_store/app/modules/products/presenter/pages/products_page.dart';
 import 'package:magazine_store/app_module.dart';
@@ -23,6 +26,8 @@ class ProductsModule extends Module {
   @override
   void binds(Injector i) {
     i.add<SharedPreferencesService>(SharedPreferencesService.new);
+    i.addLazySingleton<IInternetConnectionService>(
+        InternetConnecionServiceImpl.new);
     i.addLazySingleton<IGetProductsUsecase>(GetProductsUsecaseImpl.new);
     i.addLazySingleton<IProductsRepository>(ProductsRepositoryImpl.new);
     i.addLazySingleton<IProductsDataSource>(ProductsDatasourceImpl.new);
@@ -57,6 +62,10 @@ class ProductsModule extends Module {
         favoriteProducts: r.args.data['favoriteProducts'],
         productsPageController: r.args.data['productsPageController'],
       ),
+    );
+    r.child(
+      AppRoutes.noInternetPageRoute,
+      child: (context) => const NoInternetPage(),
     );
   }
 }

@@ -50,3 +50,8 @@ class ProductPageListEmptyState implements IProductsPageState {
   @override
   Map<int, bool> get favoriteStatus => throw UnimplementedError();
 }
+
+class ProductPageNoInternetState implements IProductsPageState {
+  @override
+  Map<int, bool> get favoriteStatus => throw UnimplementedError();
+}

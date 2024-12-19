@@ -50,9 +50,10 @@ class CardsWidget extends StatelessWidget {
               child: Row(
                 children: [
                   if (image == null || image!.isEmpty)
-                    const Placeholder(
-                      fallbackHeight: 121.0,
-                      fallbackWidth: 126.62,
+                    Image.asset(
+                      'assets/images/image_default.png',
+                      width: 126.62,
+                      height: 121.0,
                     )
                   else
                     Hero(

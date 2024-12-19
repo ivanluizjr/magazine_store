@@ -15,12 +15,14 @@ class MockProductsPageController extends Mock
 void main() {
   late MockProductsPageController mockProductsPageController;
 
-  setUp(() {
-    mockProductsPageController = MockProductsPageController();
-    when(() => mockProductsPageController.getProducts()).thenAnswer(
-      (_) async {},
-    );
-  });
+  setUp(
+    () {
+      mockProductsPageController = MockProductsPageController();
+      when(() => mockProductsPageController.getProducts()).thenAnswer(
+        (_) async {},
+      );
+    },
+  );
 
   Widget createWidgetUnderTest() {
     return MaterialApp(
@@ -54,7 +56,10 @@ void main() {
           description: "Description 1",
           category: "Category 1",
           image: '',
-          rating: Rating(rate: 4.0, count: 10),
+          rating: Rating(
+            rate: 4.0,
+            count: 10,
+          ),
         ),
       ];
 

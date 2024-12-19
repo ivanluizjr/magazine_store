@@ -2,12 +2,16 @@ import 'package:dio/dio.dart';
 import 'package:magazine_store/app/core/dio_cliient/dio_client_service.dart';
 import 'package:magazine_store/app/core/dio_cliient/dio_failure.dart';
 import 'package:magazine_store/app/core/dio_cliient/dio_response.dart';
+import 'package:magazine_store/app/core/dio_cliient/dio_service_mixin.dart';
+import 'package:magazine_store/app/core/internet_connection/internet_connection_service.dart';
 
-class DioClientServiceImpl implements IDioClientService {
+class DioClientServiceImpl extends IDioClientService with DioServiceMixin {
   final Dio dio;
+  final IInternetConnectionService internetConnecionService;
 
-  const DioClientServiceImpl({
+  DioClientServiceImpl({
     required this.dio,
+    required this.internetConnecionService,
   });
 
   @override
@@ -17,6 +21,8 @@ class DioClientServiceImpl implements IDioClientService {
     final Map<String, dynamic>? queryParams,
   }) async {
     try {
+      await throwErrorIfNotConnectionWithInternet(internetConnecionService);
+
       final response = await dio.get(
         url,
         queryParameters: queryParams,
@@ -51,6 +57,8 @@ class DioClientServiceImpl implements IDioClientService {
     final Map<String, dynamic>? body,
   }) async {
     try {
+      await throwErrorIfNotConnectionWithInternet(internetConnecionService);
+
       final response = await dio.delete(
         url,
         queryParameters: queryParams,
@@ -86,6 +94,8 @@ class DioClientServiceImpl implements IDioClientService {
     final Map<String, dynamic>? body,
   }) async {
     try {
+      await throwErrorIfNotConnectionWithInternet(internetConnecionService);
+
       final response = await dio.post(
         url,
         queryParameters: queryParams,
@@ -123,6 +133,8 @@ class DioClientServiceImpl implements IDioClientService {
     final Map<String, dynamic>? body,
   }) async {
     try {
+      await throwErrorIfNotConnectionWithInternet(internetConnecionService);
+
       final response = await dio.put(
         url,
         queryParameters: queryParams,
