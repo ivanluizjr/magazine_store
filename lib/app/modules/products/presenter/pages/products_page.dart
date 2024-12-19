@@ -78,6 +78,7 @@ class _ProductsPageState extends State<ProductsPage> {
       appBar: AppBar(
         backgroundColor: AppColors.white,
         surfaceTintColor: Colors.transparent,
+        automaticallyImplyLeading: false,
         elevation: 0,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
