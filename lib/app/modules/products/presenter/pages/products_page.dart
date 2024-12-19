@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:magazine_store/app/core/internet_connection/internet_connection_service.dart';
 import 'package:magazine_store/app/core/locales/app_locales.dart';
 import 'package:magazine_store/app/core/routes/app_routes.dart';
 import 'package:magazine_store/app/core/services/snack_bar_service.dart';
@@ -17,10 +18,12 @@ import 'package:shimmer/shimmer.dart';
 
 class ProductsPage extends StatefulWidget {
   final ProductsPageController productsPageController;
+  final IInternetConnectionService internetConnectionService;
 
   const ProductsPage({
     super.key,
     required this.productsPageController,
+    required this.internetConnectionService,
   });
 
   @override
@@ -143,10 +146,19 @@ class _ProductsPageState extends State<ProductsPage> {
             child: Observer(
               builder: (_) {
                 final state = widget.productsPageController.state;
+
                 return RefreshIndicator(
                   color: Colors.grey[300],
                   onRefresh: () async {
-                    await widget.productsPageController.getProducts();
+                    final hasConnection = await widget.internetConnectionService
+                        .checkConnection();
+
+                    if (hasConnection) {
+                      widget.productsPageController.getProducts();
+                    } else {
+                      Modular.to
+                          .pushReplacementNamed(AppRoutes.noInternetPageRoute);
+                    }
                   },
                   child: state is ProductPageLoadingState
                       ? ListView.builder(

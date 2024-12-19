@@ -182,4 +182,12 @@ abstract class _ProductsPageControllerBase with Store {
       );
     }
   }
+
+  Future<void> checkInternetConnection() async {
+    final hasConnection = await internetConnectionService.checkConnection();
+    if (hasConnection && state is ProductPageNoInternetState) {
+      state = ProductPageLoadingState();
+      await getProducts();
+    }
+  }
 }

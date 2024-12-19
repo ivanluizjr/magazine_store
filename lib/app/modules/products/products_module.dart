@@ -41,6 +41,7 @@ class ProductsModule extends Module {
       AppRoutes.initialRoute,
       child: (context) => ProductsPage(
         productsPageController: Modular.get(),
+        internetConnectionService: Modular.get(),
       ),
     );
     r.child(
@@ -65,7 +66,9 @@ class ProductsModule extends Module {
     );
     r.child(
       AppRoutes.noInternetPageRoute,
-      child: (context) => const NoInternetPage(),
+      child: (context) => NoInternetPage(
+        internetConnectionService: Modular.get(),
+      ),
     );
   }
 }

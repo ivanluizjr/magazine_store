@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:magazine_store/app/core/internet_connection/internet_connection_service.dart';
 import 'package:magazine_store/app/core/routes/app_routes.dart';
 import 'package:magazine_store/app/core/themes/app_colors.dart';
 import 'package:magazine_store/app/core/widgets/text_widget.dart';
 
 class NoInternetPage extends StatelessWidget {
-  const NoInternetPage({super.key});
+  final IInternetConnectionService internetConnectionService;
+
+  const NoInternetPage({
+    super.key,
+    required this.internetConnectionService,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +40,14 @@ class NoInternetPage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: TextButton(
-              onPressed: () => Modular.to.pushNamed(AppRoutes.initialRoute),
+              onPressed: () async {
+                final hasConnection =
+                    await internetConnectionService.checkConnection();
+
+                if (hasConnection) {
+                  Modular.to.pushNamed(AppRoutes.initialRoute);
+                }
+              },
               child: TextWidget.poppins(
                 text: 'Go Home',
                 fontSize: 16,
